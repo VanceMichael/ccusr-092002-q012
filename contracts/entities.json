@@ -1,0 +1,17 @@
+{
+  "schema_version": "1",
+  "domain": "沙漠徒步生态监测与补给",
+  "required_fields": [
+    "segment_ref",
+    "device_ref",
+    "observed_at",
+    "wind_speed",
+    "soil_moisture"
+  ],
+  "time_format": "ISO 8601 with offset",
+  "sample": {
+    "segment_ref": "DUNE-A",
+    "device_ref": "SENSOR-A",
+    "wind_speed": 12
+  }
+}
