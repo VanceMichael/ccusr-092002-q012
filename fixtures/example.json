@@ -1,5 +1,18 @@
-{
-  "segment_ref": "DUNE-A",
-  "device_ref": "SENSOR-A",
-  "wind_speed": 12
-}
+[
+  {
+    "source_record_id": "GW-20260920-0001",
+    "device_ref": "DUNE-A-W",
+    "value": 12.0,
+    "observed_at": "2026-09-20T09:00:00+08:00",
+    "quality_flag": "good",
+    "is_backfill": false
+  },
+  {
+    "source_record_id": "GW-20260920-0002",
+    "device_ref": "DUNE-A-M",
+    "value": 6.4,
+    "observed_at": "2026-09-20T08:57:00+08:00",
+    "quality_flag": "suspect",
+    "is_backfill": true
+  }
+]

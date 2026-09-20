@@ -1,17 +1,44 @@
 {
-  "schema_version": "1",
+  "schema_version": "2",
   "domain": "沙漠徒步生态监测与补给",
-  "required_fields": [
-    "segment_ref",
-    "device_ref",
-    "observed_at",
-    "wind_speed",
-    "soil_moisture"
-  ],
   "time_format": "ISO 8601 with offset",
-  "sample": {
-    "segment_ref": "DUNE-A",
-    "device_ref": "SENSOR-A",
-    "wind_speed": 12
-  }
+  "observation_ingest": {
+    "method": "POST",
+    "path": "/v1/observations",
+    "auth": "Bearer GATEWAY_TOKEN 或 RANGER_TOKEN",
+    "body_is_array": true,
+    "fields": {
+      "source_record_id": "string，必填，提交方对同一记录的识别符；与 device_ref 联合幂等去重",
+      "device_ref": "string，必填，需先登记设备",
+      "value": "number，必填，风速 m/s 或墒情百分比，按设备 metric 解释",
+      "observed_at": "string，必填，带偏移 ISO 8601（如 2026-09-20T09:00:00+08:00）",
+      "quality_flag": "good | suspect | bad，缺省 good；仅 good 且读数合理才为有效观测",
+      "is_backfill": "boolean，可选，true 表示断联恢复后的补报"
+    },
+    "rules": [
+      "乱序到达（含补报）按 observed_at 的真实时刻排序处理",
+      "只有有效观测才能触发路段风险判断",
+      "评估使用该观测时刻各要素的最近有效读数（风速越上限或墒情越下限）",
+      "同一路段同时只存在一个未解除风险；已解除后再次越限可重新触发",
+      "迟到补报不会重开采样时刻更晚的已处理风险"
+    ]
+  },
+  "roles": {
+    "ingest": "设备接入网关，仅上报观测",
+    "ranger": "路段巡护/调度：登记、风险查看与人工复核、开放预约",
+    "eco": "生态调查：仅可 GET /v1/eco/segment-summary 脱敏分段汇总"
+  },
+  "endpoints": {
+    "POST /v1/admin/segments": "登记/更新路段及阈值",
+    "POST /v1/admin/devices": "登记/更新设备（wind_speed 或 soil_moisture）",
+    "POST /v1/admin/supply-stations": "登记补给站与饮水库存（升）",
+    "GET /v1/risk-assessments": "风险列表（可按 status、segment_ref 过滤）",
+    "GET /v1/risk-assessments/{id}": "风险详情，含触发暂停的原始观测及配套读数",
+    "POST /v1/risk-assessments/{id}/reviews": "人工复核：confirm 维持暂停 / resolve 解除",
+    "POST /v1/openings": "开放决定：headcount × 人均水量原子扣减库存，idempotency_key 防重复预约",
+    "POST /v1/openings/{id}/cancel": "取消预约并归还水量",
+    "GET /v1/openings": "预约查询",
+    "GET /v1/eco/segment-summary": "脱敏分段汇总（无设备编号、来源编号、原始记录、人员、补给信息）"
+  },
+  "privacy_note": "赛后分析不得使用游客数量推断植被影响；生态视角仅提供按路段与时间窗的聚合值。"
 }
