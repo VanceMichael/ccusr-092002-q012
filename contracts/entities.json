@@ -1,17 +1,59 @@
 {
-  "schema_version": "1",
+  "schema_version": "2",
   "domain": "沙漠徒步生态监测与补给",
-  "required_fields": [
-    "segment_ref",
-    "device_ref",
-    "observed_at",
-    "wind_speed",
-    "soil_moisture"
-  ],
   "time_format": "ISO 8601 with offset",
+  "entities": {
+    "observation": {
+      "description": "设备上报的单条观测；source_ref 为提交方对同一记录的识别符，断联补报按 (device_ref, source_ref) 去重",
+      "required_fields": [
+        "source_ref",
+        "device_ref",
+        "segment_ref",
+        "observed_at",
+        "wind_speed",
+        "soil_moisture"
+      ],
+      "fields": {
+        "source_ref": "string，提交方记录标识",
+        "device_ref": "string，监测设备编号",
+        "segment_ref": "string，路段编号",
+        "observed_at": "string，观测时间，ISO 8601 带时区偏移",
+        "wind_speed": "number，风速 m/s，>= 0",
+        "soil_moisture": "number，土壤含水率 %，0-100",
+        "quality": "string，valid | suspect | invalid，缺省 valid；仅 valid 参与风险判断"
+      }
+    },
+    "risk_event": {
+      "description": "有效观测越限触发的路段风险事件；status: open | confirmed | released",
+      "thresholds": {
+        "wind_speed_limit": "默认 14 m/s，环境变量 WIND_SPEED_LIMIT 可调",
+        "soil_moisture_min": "默认 8%，环境变量 SOIL_MOISTURE_MIN 可调"
+      }
+    },
+    "review": {
+      "description": "巡护人工复核；decision: confirm_pause | release"
+    },
+    "supply_station": {
+      "required_fields": ["station_ref", "segment_ref", "water_capacity_liters"]
+    },
+    "reservation": {
+      "description": "补给预约；request_ref 为幂等键，重复提交返回原预约，不重复占用库存",
+      "required_fields": ["request_ref", "station_ref", "team_ref", "team_size", "water_liters"]
+    }
+  },
+  "roles": {
+    "sensor": "上报观测",
+    "ranger": "查看原始观测与风险事件、人工复核、登记补给站",
+    "supply": "预约补给、查看库存、提交开放检查",
+    "researcher": "仅可获取脱敏的分段日汇总"
+  },
   "sample": {
-    "segment_ref": "DUNE-A",
+    "source_ref": "SRC-20260920-01",
     "device_ref": "SENSOR-A",
-    "wind_speed": 12
+    "segment_ref": "DUNE-A",
+    "observed_at": "2026-09-20T08:00:00+08:00",
+    "wind_speed": 12,
+    "soil_moisture": 15,
+    "quality": "valid"
   }
 }

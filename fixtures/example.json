@@ -1,5 +1,9 @@
 {
-  "segment_ref": "DUNE-A",
+  "source_ref": "SRC-20260920-01",
   "device_ref": "SENSOR-A",
-  "wind_speed": 12
+  "segment_ref": "DUNE-A",
+  "observed_at": "2026-09-20T08:00:00+08:00",
+  "wind_speed": 12,
+  "soil_moisture": 15,
+  "quality": "valid"
 }
